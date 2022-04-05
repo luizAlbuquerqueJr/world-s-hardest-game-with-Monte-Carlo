@@ -1,0 +1,46 @@
+MOV_UP = -1
+MOV_DOWN = -2
+MOV_LEFT = -3
+MOV_RIGHT = -4
+MOV_STOP = -5
+
+# # mapa 2
+# WIDTH = 100
+# HEIGHT = 100
+# SIZE_OBJECT = 10
+
+#mapa 1
+WIDTH = 50
+HEIGHT = 50
+# SIZE_OBJECT = 10
+SIZE_OBJECT = 20
+#color
+WHITE=(255,255,255)
+GRAY=(230,227,230)
+BLUE=(0,0,255)
+RED =(255,0,0)
+GREEN =(255,0,0)
+LIGHT_GREEN =(175,243,185)
+LIGHT_PURPLE =(181,186,252)
+BLACK = (0,0,0)
+YELLOW =(255,255,0)
+#constantes do mapa
+INICIO = 0
+PAREDE = 1
+LIVRE = 2
+INIMIGO = 3
+INIMIGOV = 4# subindo
+INIMIGOVV = 5# descendo
+INIMIGOH = 6 # indo para direita
+INIMIGOHH = 7 # indo para esquerda
+INIMIGOD = 8
+INIMIGODD = 9
+INIMIGOD1 = 10
+INIMIGOD11 = 11
+INIMIGOD2 = 12
+INIMIGOD22 = 13
+
+xMinMap = 6
+yMinMap = 13
+xMaxMap = 42
+yMaxMap = 35

@@ -117,7 +117,7 @@ class Player:
         if(count > LIMTI_COUNT): count = LIMTI_COUNT
         self.sensor['ULCount'] = count
         # print(self.sensor)
-        # pygame.display.update()
+        pygame.display.update()
         return self.sensor
     
     def step(self,mapa,movimento):

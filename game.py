@@ -17,7 +17,18 @@ MAX_RODADA = 800
 SCREENW = constanteMapa.WIDTH*constanteMapa.SIZE_OBJECT
 SCREENH =  constanteMapa.HEIGHT*constanteMapa.SIZE_OBJECT
 clock = pygame.time.Clock()
-
+def showFreeSpace(DISPLAY, x,y, color1 =constanteMapa.WHITE, color2 =constanteMapa.GRAY):
+    if(x%2 != y%2):
+        pygame.draw.rect(DISPLAY,color1,(x*constanteMapa.SIZE_OBJECT,y*constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT))
+    else:    
+        pygame.draw.rect(DISPLAY,color2,(x*constanteMapa.SIZE_OBJECT,y*constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT))
+    
+def showPlayer(DISPLAY, p1):
+    if(p1.vida == 0):
+        pygame.draw.rect(DISPLAY,(128,128,128),(p1.x*constanteMapa.SIZE_OBJECT,p1.y*constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT))
+    else:
+        pygame.draw.rect(DISPLAY,(255,0,0),pygame.Rect(p1.x*constanteMapa.SIZE_OBJECT,p1.y*constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT))
+        pygame.draw.rect(DISPLAY,(0,0,0),pygame.Rect(p1.x*constanteMapa.SIZE_OBJECT,p1.y*constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT),2)
 def showMap(DISPLAY,matrixMap,players,verbose,SPEED,bestPlayer = 0):
     if(verbose == True):
         count = 0
@@ -28,32 +39,17 @@ def showMap(DISPLAY,matrixMap,players,verbose,SPEED,bestPlayer = 0):
                 if(elemento == constanteMapa.PAREDE):
                     pygame.draw.rect(DISPLAY,constanteMapa.LIGHT_PURPLE,(x*constanteMapa.SIZE_OBJECT,y*constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT))
                 if(elemento == constanteMapa.LIVRE):
-                    if(x%2 != y%2):
-                        pygame.draw.rect(DISPLAY,constanteMapa.GRAY,(x*constanteMapa.SIZE_OBJECT,y*constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT))
-                    else:    
-                        pygame.draw.rect(DISPLAY,constanteMapa.WHITE,(x*constanteMapa.SIZE_OBJECT,y*constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT))    
-                    
+                    showFreeSpace(DISPLAY,x,y)
                 if(elemento > constanteMapa.INIMIGO):
+                    showFreeSpace(DISPLAY,x,y)
                     pygame.draw.circle(DISPLAY, constanteMapa.BLACK, (x*constanteMapa.SIZE_OBJECT + constanteMapa.SIZE_OBJECT/2, y*constanteMapa.SIZE_OBJECT + constanteMapa.SIZE_OBJECT/2), 6,1)
-                    pygame.draw.circle(DISPLAY, constanteMapa.BLUE, (x*constanteMapa.SIZE_OBJECT + constanteMapa.SIZE_OBJECT/2, y*constanteMapa.SIZE_OBJECT + constanteMapa.SIZE_OBJECT/2), 5)
-        
-                # pygame.display.update()
-                # if(elemento == 1):
-                #     pygame.draw.rect(DISPLAY,RED,(x*SIZE_OBJECT,y*SIZE_OBJECT,SIZE_OBJECT,SIZE_OBJECT))
-                    
-                count = count +1
-        
+                    pygame.draw.circle(DISPLAY, constanteMapa.BLUE, (x*constanteMapa.SIZE_OBJECT + constanteMapa.SIZE_OBJECT/2, y*constanteMapa.SIZE_OBJECT + constanteMapa.SIZE_OBJECT/2), 5)                            
         for p1, index in zip(players,range(len(players))):
+            # apagar essa linha caso não queira exibir os sensores
+            p1.readSensor(DISPLAY, matrixMap,-1)
             if(matrixMap[p1.x][p1.y] > constanteMapa.INIMIGO):
                 p1.vida = 0
-            else:
-                # if(index == bestPlayer):
-                #     pygame.draw.rect(DISPLAY,(0,255,255),(p1.x*constanteMapa.SIZE_OBJECT,p1.y*constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT))
-                if(p1.vida == 0):
-                    pygame.draw.rect(DISPLAY,(128,128,128),(p1.x*constanteMapa.SIZE_OBJECT,p1.y*constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT))
-                else:
-                    pygame.draw.rect(DISPLAY,(255,0,0),pygame.Rect(p1.x*constanteMapa.SIZE_OBJECT,p1.y*constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT))
-                    pygame.draw.rect(DISPLAY,(0,0,0),pygame.Rect(p1.x*constanteMapa.SIZE_OBJECT,p1.y*constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT,constanteMapa.SIZE_OBJECT),2)
+            showPlayer(DISPLAY, p1)
         if(verbose == True):
             pygame.display.update()
     else:
@@ -82,7 +78,7 @@ def inicializaPlayers(size, name, prefix, desconto, epsilon):
 def loadMC(MCs):
     for i in range(len(MCs)):
         MCs[i].loadMC()
-def mainGame(DISPLAY, players,isMaquina,verbose,MCs,enemy,SPEED,bestPlayer=-1):
+def mainGame(DISPLAY, players,isMaquina,verbose,MCs,enemy,SPEED, bestPlayer=-1) :
 
     stateHistory = []
     actionHistory = []
@@ -238,17 +234,17 @@ def main():
     configuracoes = {}
 
     TAXA_FRAME = 1
-    SPEED = 0.2
+    # SPEED = 0.2
     
-    # TAXA_FRAME = 100
-    # SPEED = 0
+    # TAXA_FRAME = 1000
+    SPEED = 0
         
     # TOTAL_EPISODE = 3000
     # DESCONTOS = [0.3, 0.5, 0.6, 0.7, 0.9]
     # EPSILONS = [0.03,0.1, 0.2,0,3]    
-    TOTAL_EPISODE = 999999999
-    DESCONTOS = [0.9]
-    EPSILONS = [0.1]
+    TOTAL_EPISODE = 50000
+    DESCONTOS = [0.9, 0.8]
+    EPSILONS = [0.1, 0.2]
     for rodada in range(1,2):
         print('rodada: ' + str(rodada))
         for desconto in DESCONTOS:
@@ -260,10 +256,10 @@ def main():
                 loadMC(MCs)
                 while(MCs[0].episode < TOTAL_EPISODE):
                     MCs[0].increaseEpisode()
-                    enemy = maps.setMap2() # cria inimigos
+                    enemy = maps.setMap1() # cria inimigos 1, 2 e 3
                     MCs[0].loadSteps()
 
-                    # enemy = mapa.loadMap6() # cria inimigos
+                    # enemy = mapa.loadMap4() # cria inimigos 4, 5 e 6
                     isNeedSalve = MCs[0].episode%10000 == 0
                     verbose = episodio % TAXA_FRAME == 0
                     if(verbose): print('episódio: ', episodio)
